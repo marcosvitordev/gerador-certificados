@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Administração</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <h1>Painel de Administração</h1>
+    <form id="configForm">
+        <div>
+            <label>Nome da Escola:</label>
+            <input type="text" id="escola" name="escola" required>
+        </div>
+
+        <div>
+            <label>Nome do Professor:</label>
+            <input type="text" id="professor" name="professor" required>
+        </div>
+
+        <button type="submit">Salvar Configuração</button>
+    </form>
+
+    <script>
+        async function carregarConfig() {
+            const res = await fetch("/config");
+            const config = await res.json();
+            document.getElementById("escola").value = config.escola;
+            document.getElementById("professor").value = config.professor;
+        }
+
+        document.getElementById("configForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const escola = document.getElementById("escola").value;
+            const professor = document.getElementById("professor").value;
+
+            await fetch("/salvar-config", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ escola, professor })
+            });
+
+            alert("Configuração salva com sucesso!");
+        });
+
+        window.onload = carregarConfig;
+    </script>
+
+</body>
+
+</html>

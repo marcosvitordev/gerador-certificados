@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Certificados</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <h1>Gerador de Certificados</h1>
+    <form id="certificadoForm">
+        <div>
+            <label for="nome">Nome do Aluno:</label>
+            <input type="text" id="nome" name="nome" placeholder="Digite o nome" required>
+        </div>
+
+        <div>
+            <label for="data_inicio">Data de Início:</label>
+            <input type="date" id="data_inicio" name="data_inicio" required>
+        </div>
+
+        <div>
+            <label for="data_fim">Data de Término:</label>
+            <input type="date" id="data_fim" name="data_fim" required>
+        </div>
+
+        <button type="submit">Gerar Certificado</button>
+    </form>
+
+    <div id="resultado"></div>
+
+    <script>
+        document.getElementById("certificadoForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const nome = document.getElementById("nome").value;
+            const data_inicio = document.getElementById("data_inicio").value;
+            const data_fim = document.getElementById("data_fim").value;
+
+            const response = await fetch("/gerar-certificado", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `nome=${encodeURIComponent(nome)}&data_inicio=${encodeURIComponent(data_inicio)}&data_fim=${encodeURIComponent(data_fim)}`
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert("Certificado gerado com sucesso!");
+                document.getElementById("resultado").innerHTML = `
+                    <p>✅ Certificado gerado!</p>
+                    <p><a href="${result.link}" target="_blank">🔗 Verificar Certificado</a></p>
+                `;
+            } else {
+                document.getElementById("resultado").innerText = "Erro ao gerar certificado.";
+            }
+        });
+    </script>
+
+</body>
+
+</html>

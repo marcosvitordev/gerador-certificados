@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validação de Certificado</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        async function carregarCertificado() {
+            const params = new URLSearchParams(window.location.search);
+            const codigo = params.get("codigo");
+
+            if (!codigo) {
+                document.getElementById("info").innerHTML = "<p style='color:red;'>Código inválido!</p>";
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/validar/${codigo}`);
+                const certificado = await res.json();
+
+                if (certificado.erro) {
+                    document.getElementById("info").innerHTML = "<p style='color:red;'>Certificado não encontrado! Procure o administrador ou a escola.</p>";
+                    return;
+                }
+
+                document.getElementById("info").innerHTML = `
+                    <h2>✅ Certificado Válido</h2>
+                    <p><strong>Nome:</strong> ${certificado.nome}</p>
+                    <p><strong>Data de Início:</strong> ${certificado.data_inicio}</p>
+                    <p><strong>Data de Término:</strong> ${certificado.data_fim}</p>
+                    <p><strong>Escola:</strong> ${certificado.escola}</p>
+                    <p><strong>Professor:</strong> ${certificado.professor}</p>
+                    <p><strong>Código de Autenticidade:</strong> ${certificado.codigo}</p>
+                    <a href="/download/${certificado.codigo}" download>📄 Baixar Certificado (PDF)</a>
+                    <h3>Visualizar Certificado:</h3>
+                    <iframe id="pdfViewer" width="100%" height="500px"></iframe>
+                `;
+
+                // Exibir o PDF no iframe
+                document.getElementById("pdfViewer").src = `/certificados/${certificado.codigo}.pdf`;
+            } catch (error) {
+                document.getElementById("info").innerHTML = "<p style='color:red;'>Erro ao buscar certificado!</p>";
+            }
+        }
+
+        window.onload = carregarCertificado;
+    </script>
+</head>
+<body>
+    <h1>Autenticação de Certificado</h1>
+    <div id="info">Carregando...</div>
+</body>
+</html>
